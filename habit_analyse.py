@@ -18,33 +18,29 @@ class HabitAnalyser:
         Get all habits from the database
         :return: List of Habit objects
         """
+        habits = []
         self.cursor.execute('SELECT * FROM habits')
         rows = self.cursor.fetchall()
-        habits = []
         for row in rows:
-            habit = Habit(row[0], row[1], row[2], row[3], row[4])
-            progress = row[5]
-            if isinstance(progress, str):
-                habit.progress = eval(progress)
-            else:
-                if progress is None:
-                    habit.progress = 0
-                else:
-                    try:
-                        habit.progress = int(progress)
-                    except ValueError:
-                        habit.progress = 0
+            name = row[1]
+            description = row[2]
+            start_date = row[3]
+            end_date = row[4]
+            frequency = row[5]
+            progress = row[6]
+            habit = Habit(name, description, start_date, end_date, frequency, progress)
             habits.append(habit)
         return habits
 
     def get_all_habits(self):
         """
         get all habits from the database
-        :return: habits
+        :return: habit_names
         """
-        self.cursor.execute('SELECT * FROM habits')
         habits = self.retrieve_habit()
-        return habits
+        # Get a list of just the habit names
+        habit_names = [h.name for h in habits]
+        return habit_names
 
     def get_habits_with_periodicity(self, frequency):
         """
