@@ -31,6 +31,9 @@ class HabitTracker:
                 FOREIGN KEY (habit_name) REFERENCES habits(name)
             )''')
 
+        # self.cursor.execute("DELETE FROM habits")
+        # self.cursor.execute("DELETE FROM tracker")
+
         self.conn.commit()
 
     def create_habit(self, name, description, start_date, end_date, frequency):
