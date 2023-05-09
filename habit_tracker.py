@@ -40,40 +40,11 @@ class Habit:
         check if the habit is currently on a streak
         :return: True if the habit is on a streak, False otherwise
         """
-        if not self.start_date:
-            return False
-
         today = date.today()
-        start_date = self.start_date
-
-        # Get the number of days between the start date and today
-        num_days = (today - start_date).days + 1
-
-        if len(self.progress) == 0:
-            return False
-
-        if self.frequency == 'daily':
-            last_completion = self.progress[-1]
-            if (today - last_completion).days > 1:
-                return False
-            return last_completion == today - timedelta(days=len(self.progress) - 1)
-        elif self.frequency == 'weekly':
-            if len(self.progress) < 7:
-                return False
-            last_completion = self.progress[-1]
-            if (today - last_completion).days > 7:
-                return False
-            week_start_date = today - timedelta(days=today.weekday())
-            week_completion_dates = [d for d in self.progress if d >= week_start_date]
-            return len(week_completion_dates) == len(set(week_completion_dates))
-        elif self.frequency == 'monthly':
-            if len(self.progress) < num_days:
-                return False
-            last_completion = self.progress[-1]
-            if (today - last_completion).days > 30:
-                return False
-            month_start_date = today.replace(day=1)
-            month_completion_dates = [d for d in self.progress if d >= month_start_date]
-            return len(month_completion_dates) == len(set(month_completion_dates))
-        else:
-            raise ValueError("Invalid frequency")
+        if self.frequency == 'daily' and today == self.progress[-1] + timedelta(days=1):
+            return True
+        elif self.frequency == 'weekly' and today == self.progress[-1] + timedelta(weeks=1):
+            return True
+        elif self.frequency == 'monthly' and today == self.progress[-1] + timedelta(months=1):
+            return True
+        return False
