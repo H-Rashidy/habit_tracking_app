@@ -3,7 +3,7 @@ from habit_tracker import Habit
 
 
 class HabitTracker:
-    def __init__(self, name='main.db'):
+    def __init__(self, name='main.db', isolation_level=None):
         """
         initialize a habit tracker object
         :param name: name of the database file
@@ -11,7 +11,7 @@ class HabitTracker:
         : create a cursor object to execute SQL commands
         : create tables if they don't exist
         """
-        self.conn = sqlite3.connect(name)
+        self.conn = sqlite3.connect(name, isolation_level=isolation_level)
         self.cursor = self.conn.cursor()
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS habits (
@@ -99,7 +99,8 @@ class HabitTracker:
         delete a habit from the database
         :param name:
         """
-        self.cursor.execute('DELETE FROM habits WHERE name = ?', (name,))
+        habit = Habit(name)
+        self.cursor.execute('DELETE FROM habits WHERE name = ?', (habit.name,))
         self.conn.commit()
 
     def update_habit(self, name, description, start_date, end_date, frequency):
