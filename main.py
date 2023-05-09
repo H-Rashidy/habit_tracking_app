@@ -69,13 +69,13 @@ def cli():
                          "Return the longest run streak of all defined habits",
                          "Return the longest run streak for a given habit"]).ask()
             if sub_choice == "Return a list of all currently tracked habits":
-                habits = analyser.get_all_habits()
-                if len(habits) == 0:
+                habit_names = analyser.get_all_habits()
+                if len(habit_names) == 0:
                     print("No habits currently tracked.")
                 else:
                     print("Currently tracked habits:")
-                    for habit in habits:
-                        print(habit.name)
+                    for name in habit_names:
+                        print(name)
             elif sub_choice == "Return a list of all habits with the same periodicity":
                 frequency = questionary.text("Enter frequency (daily/weekly/monthly): ").ask()
                 matching_habits = analyser.get_habits_with_periodicity(frequency)
