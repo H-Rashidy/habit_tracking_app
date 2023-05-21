@@ -143,3 +143,5 @@ class TestHabitAnalyser:
 
     def test_get_longest_streak_for_habit(self, habit_analyser):
         assert habit_analyser.get_longest_streak_for_habit('gym') > 0
+
+        
