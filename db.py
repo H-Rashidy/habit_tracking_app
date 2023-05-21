@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import date
 from habit_tracker import Habit
 
 
@@ -39,11 +40,11 @@ class HabitTracker:
     def create_habit(self, name, description, start_date, end_date, frequency):
         """
         create a habit object and insert it into the database
-        :param name:
-        :param description:
-        :param start_date:
-        :param end_date:
-        :param frequency:
+        :param name: name of the habit
+        :param description: description of the habit
+        :param start_date: start date of the habit
+        :param end_date: end date of the habit
+        :param frequency: frequency of the habit
         """
         habit = Habit(name, description, start_date, end_date, frequency)
         self.cursor.execute('''
@@ -52,10 +53,24 @@ class HabitTracker:
         ''', (habit.name, habit.description, habit.start_date, habit.end_date, habit.frequency, str(habit.progress)))
         self.conn.commit()
 
+    def predefined_habits(self):
+        """
+        create a few predefined habits
+        :return: habit_names
+        """
+        habit_1 = Habit("Exercise", "Workout for 30 minutes", date(2020, 1, 1), date(2020, 1, 28), "daily")
+        habit_2 = Habit("Meditate", "Meditate for 10 minutes", date(2020, 1, 1), date(2020, 1, 28), "weekly")
+        habit_3 = Habit("Journal", "Write in journal for 5 minutes", date(2020, 1, 1), date(2020, 1, 28), "daily")
+        habit_4 = Habit("Read", "Read for 15 minutes", date(2020, 1, 1), date(2020, 1, 28), "weekly")
+        habit_5 = Habit("Drink Water", "Drink 8 glasses of water", date(2020, 1, 1), date(2020, 1, 28), "daily")
+
+        habit_names = [h.name for h in [habit_1, habit_2, habit_3, habit_4, habit_5]]
+        return habit_names
+
     def get_habit(self, habit_name):
         """
         get a habit object from the database
-        :param habit_name:
+        :param habit_name: name of the habit
         :return: ‘Habit’ object
         """
         self.cursor.execute('SELECT * FROM habits WHERE name = ?', (str(habit_name),))
@@ -63,12 +78,12 @@ class HabitTracker:
         if row is None:
             return None
         name, description, start_date, end_date, frequency, progress, *extra_values = row
-        return Habit(name, description, start_date, end_date, frequency, progress=eval(progress))
+        return Habit(name, description, start_date, end_date, frequency, progress=progress)
 
     def get_tracker(self, habit_name):
         """
         get a habit tracker object from the database
-        :param habit_name:
+        :param habit_name: name of the habit
         :return: ‘HabitTracker’ object
         """
         self.cursor.execute(
@@ -80,9 +95,9 @@ class HabitTracker:
     def check_habit(self, habit_name, event_date, completed):
         """
         check if a habit was completed on a given date
-        :param habit_name:
-        :param event_date:
-        :param completed:
+        :param habit_name: name of the habit
+        :param event_date: date of the event
+        :param completed: boolean value
         :return: ‘Habit’ object
         """
         habit_completed = Habit(habit_name, end_date=event_date)
@@ -100,7 +115,7 @@ class HabitTracker:
     def delete_habit(self, name):
         """
         delete a habit from the database
-        :param name:
+        :param name: name of the habit
         """
         habit = Habit(name)
         self.cursor.execute('DELETE FROM habits WHERE name = ?', (habit.name,))
@@ -109,11 +124,11 @@ class HabitTracker:
     def update_habit(self, name, description, start_date, end_date, frequency):
         """
         update a habit in the database
-        :param name:
-        :param description:
-        :param start_date:
-        :param end_date:
-        :param frequency:
+        :param name: name of the habit
+        :param description: description of the habit
+        :param start_date: start date of the habit
+        :param end_date: end date of the habit
+        :param frequency: frequency of the habit
         """
         habit = Habit(name, description, start_date, end_date, frequency)
         self.cursor.execute('''
@@ -125,3 +140,5 @@ class HabitTracker:
 
     def close(self):
         self.conn.close()
+
+        
