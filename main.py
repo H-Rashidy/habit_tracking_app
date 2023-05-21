@@ -13,13 +13,14 @@ def cli():
         questionary.print("Welcome to the Habit Tracker!")
 
         choice = questionary.select(
-            "Wat would you like to do?",
+            "What would you like to do?",
             choices=["Add a habit",
                      "Delete a habit",
                      "Update a habit",
                      "Check a habit",
                      "Analyze a habit",
                      "View progress for a habit",
+                     "Choose from predefined habits",
                      "Exit"]).ask()  # ask() returns the user's choice
 
         if choice == "Add a habit":
@@ -106,6 +107,54 @@ def cli():
                 print(f"No habit '{name}' currently tracked.")
             else:
                 print(f"Progress for habit '{name}': {progress}")
+
+        elif choice == "Choose from predefined habits":
+            habit_names = tracker.predefined_habits()
+            selected_habit = questionary.select("Select a habit:", choices=habit_names).ask()
+            sub_choice_2 = questionary.select(
+                "What would you like to do?",
+                choices=["Update",
+                         "Delete",
+                         "Check",
+                         "View Progress",
+                         "Exit"]).ask()
+
+            if sub_choice_2 == "Update":
+                while True:
+                    habit = tracker.get_habit(selected_habit)
+                    if habit is None:
+                        print(f"Habit '{selected_habit}' not found.")
+                    else:
+                        description = questionary.text("What is the new description of the habit?").ask()
+                        start_date = questionary.text("When does the habit start? (YYYY-MM-DD) ").ask()
+                        end_date = questionary.text("When does the habit end? (YYYY-MM-DD) ").ask()
+                        frequency = questionary.text("Enter frequency (daily/weekly/monthly): ").ask()
+                        tracker.update_habit(selected_habit, description, start_date, end_date, frequency)
+                        print(f"Habit '{selected_habit}' updated.")
+                    break
+
+            elif sub_choice_2 == "Delete":
+                # Delete habit code
+                habit = tracker.get_habit(selected_habit)
+                if habit is None:
+                    print(f"No habit found with name '{selected_habit}'.")
+                tracker.delete_habit(selected_habit)
+                print(f"Habit '{selected_habit}' deleted.")
+
+            elif sub_choice_2 == "Check":
+                habit = tracker.get_habit(selected_habit)
+                event_date = date.today()
+                completed = questionary.confirm(
+                    "Did you complete the habit today?").ask()  # define completed variable
+                tracker.check_habit(selected_habit, event_date, completed)  # pass completed variable as argument
+                print(f"Habit '{selected_habit}' checked.")
+
+            elif sub_choice_2 == "View Progress":
+                progress = tracker.get_tracker(selected_habit)
+                if progress is None:
+                    print(f"No habit '{selected_habit}' currently tracked.")
+                else:
+                    print(f"Progress for habit '{selected_habit}': {progress}")
 
         elif choice == "Exit":
             print("Goodbye!")
