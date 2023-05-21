@@ -45,7 +45,7 @@ class HabitAnalyser:
     def get_habits_with_periodicity(self, frequency):
         """
         get habits with a specific periodicity from the database
-        :param frequency:
+        :param frequency: periodicity of the habit
         :return: habits
         """
         self.cursor.execute('SELECT * FROM habits WHERE frequency = ?', (frequency,))
@@ -79,14 +79,32 @@ class HabitAnalyser:
         habits = self.get_all_habits()
         max_streak = 0
         for habit in habits:
-            progress = habit.progress
-            current_streak = 0
-            for mark in progress:
-                if mark == 1:
-                    current_streak += 1
-                else:
-                    current_streak = 0
-                max_streak = max(max_streak, current_streak)
+            if isinstance(habit, Habit):
+                progress = eval(habit.progress)
+                current_streak = 0
+                for mark in progress:
+                    if mark == 1:
+                        current_streak += 1
+                    else:
+                        current_streak = 0
+                    max_streak = max(max_streak, current_streak)
+            else:
+                name = habit[0]
+                progress_index = 0
+                for i, field in enumerate(habit.split(',')):
+                    if field == 'progress':
+                        progress_index = i + 1
+                        break
+                habit = habit.split(',')
+                progress = habit[progress_index]
+                habit = Habit(name, progress=progress)
+                current_streak = 0
+                for mark in progress:
+                    if mark == 1:
+                        current_streak += 1
+                    else:
+                        current_streak = 0
+                    max_streak = max(max_streak, current_streak)
         return max_streak
 
     def get_longest_streak_for_habit(self, name):
@@ -96,11 +114,11 @@ class HabitAnalyser:
         :return: max_streak
         """
         habits = self.get_all_habits()
-        habits = [h for h in habits if h.name == name]
+        habits = [h for h in habits if not isinstance(h, str)]
         if not habits:
             return 0
         habit = habits[0]
-        progress = habit.progress
+        progress = eval(habit.progress)
 
         max_streak = 0
         current_streak = 0
